@@ -5,17 +5,21 @@ uint16_t sensorValues[8] = [0, 0, 0, 0, 0, 0, 0, 0];
 
 void setup()
 {
+  //init IR sensros
   ECE3_Init();
-  pinMode(41, OUTPUT)
-  pinMode(
+
+  //init all pins
+  pinMode(FRONT_RIGHT_LED_PIN, OUTPUT)
+  pinMode(FRONT_LEFT_LED_PIN, OUTPUT)
+  pinMode(DIR_L_PIN, OUTPUT)
+  pinMode(DIR_R_PIN, OUTPUT)
+  pinMode(PWML_PIN, OUTPUT)
+  pinMode(PWMR_PIN, OUTPUT)
+
   Serial.begin(9600); // set the data rate in bits per second for serial data transmission
   delay(2000);
 }
 
-// Reads IR sensors. outputs 
-void readIRsensors() {
-  
-}
 
 void normalizeSensorValues() {
   // find min and max element

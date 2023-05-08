@@ -19,7 +19,6 @@ uint_16 readIRsensors() {
 }
 
 void normalizeSensorValues() {
-
   // find min and max element
   int i;
   uint16_t min = 0;
@@ -35,8 +34,11 @@ void normalizeSensorValues() {
     sensorValues[i] = (sensorValues[i] - min)/max * 1000;
 }
 
-void weightSensorValues {
-
+void weightSensorValues() {
+  // multiply array with weights
+  int i;
+  for(i=0;i<NUM_SENS;i++)
+    sensorValues[i] = sensorValues[i] * sensorWeights[i];
 }
 
 void calculateMotorOutputs() {

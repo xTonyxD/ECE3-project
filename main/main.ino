@@ -6,9 +6,13 @@ uint16_t sensorValues[NUM_SENS] = [0, 0, 0, 0, 0, 0, 0, 0];
 
 uint16_t sensorValues[NUM_SENS];
 
+uint16_t sensorValues[8] = [0, 0, 0, 0, 0, 0, 0, 0];
+
 void setup()
 {
   ECE3_Init();
+  pinMode(41, OUTPUT)
+  pinMode(
   Serial.begin(9600); // set the data rate in bits per second for serial data transmission
   delay(2000);
 }
@@ -36,7 +40,7 @@ void weightSensorValues() {
     sensorValues[i] = sensorValues[i] * sensorWeights[i];
 }
 
-void calculateMotorOutputs() {
+void calculateMotorOutputs{
   
 }
 

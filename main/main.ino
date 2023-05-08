@@ -13,16 +13,31 @@ void setup()
 }
 
 // Reads IR sensors. outputs 
-uint_16 readIRsensors() {
+void readIRsensors() {
   
 }
 
 void normalizeSensorValues() {
-
+  // find min and max element
+  int i;
+  uint16_t min = 0;
+  uint16_t max = 0;
+  for(i=0;i<NUM_SENS;i++) {
+    if(sensorValues[i] <= min)
+      min = sensorValues[i];
+    if(sensorValues[i] >= max)
+      max = sensorValues[i];
+  }
+  // normalize sensor values
+  for(i=0;i<NUM_SENS;i++) 
+    sensorValues[i] = (sensorValues[i] - min)/max * 1000;
 }
 
-void weightSensorValues {
-
+void weightSensorValues() {
+  // multiply array with weights
+  int i;
+  for(i=0;i<NUM_SENS;i++)
+    sensorValues[i] = sensorValues[i] * sensorWeights[i];
 }
 
 void calculateMotorOutputs{

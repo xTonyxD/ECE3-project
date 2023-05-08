@@ -1,4 +1,7 @@
 #include <ECE3.h>
+#include <constants.h>
+
+uint16_t sensorValues[8] = [0, 0, 0, 0, 0, 0, 0, 0];
 #define NUM_SENS 8
 
 uint16_t sensorValues[NUM_SENS];
@@ -10,12 +13,12 @@ void setup()
   delay(2000);
 }
 
-void readIRsensors() {
+// Reads IR sensors. outputs 
+uint_16 readIRsensors() {
 
 }
 
 void normalizeSensorValues() {
-  // subtract min, divide by max, multiply by 1000
 
   // find min and max element
   int i;
@@ -32,13 +35,14 @@ void normalizeSensorValues() {
     sensorValues[i] = (sensorValues[i] - min)/max * 1000;
 }
 
-void weightSensorValues() {
+void weightSensorValues {
 
 }
 
 void calculateMotorOutputs() {
   
 }
+
 
 void loop()
 {

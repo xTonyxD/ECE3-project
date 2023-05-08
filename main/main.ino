@@ -1,7 +1,7 @@
 #include <ECE3.h>
-#include <constants.h>
+#include "constants.h"
 
-uint16_t sensorValues[NUM_SENS] = [0, 0, 0, 0, 0, 0, 0, 0];
+uint16_t sensorValues[] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 void setup()
 {
@@ -9,12 +9,12 @@ void setup()
   ECE3_Init();
 
   //init all pins
-  pinMode(FRONT_RIGHT_LED_PIN, OUTPUT)
-  pinMode(FRONT_LEFT_LED_PIN, OUTPUT)
-  pinMode(DIR_L_PIN, OUTPUT)
-  pinMode(DIR_R_PIN, OUTPUT)
-  pinMode(PWML_PIN, OUTPUT)
-  pinMode(PWMR_PIN, OUTPUT)
+  pinMode(FRONT_RIGHT_LED_PIN, OUTPUT);
+  pinMode(FRONT_LEFT_LED_PIN, OUTPUT);
+  pinMode(DIR_L_PIN, OUTPUT);
+  pinMode(DIR_R_PIN, OUTPUT);
+  pinMode(PWML_PIN, OUTPUT);
+  pinMode(PWMR_PIN, OUTPUT);
 
   Serial.begin(9600); // set the data rate in bits per second for serial data transmission
   delay(2000);
@@ -64,8 +64,11 @@ void loop()
 {
   // read raw sensor values
   ECE3_read_IR(sensorValues);
+  normalizeSensorValues();
+  weightSensorValues();
+  calculateMotorOutputs();
 
-  Serial.println();
+  Serial.println(fuseSensors());
 
   delay(50);
 }

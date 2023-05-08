@@ -40,7 +40,6 @@ void calculateMotorOutputs{
   
 }
 
-
 void loop()
 {
   // read raw sensor values

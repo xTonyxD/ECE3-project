@@ -1,6 +1,9 @@
 #include <ECE3.h>
 
 uint16_t sensorValues[8];
+uint16_t sensorMins = [666, 643, 643, 643, 574, 620, 666, 689];
+uint16_t sensorMaxes = [1834, 1857,  1857, 1857, 1846.6, 1880, 1834, 1811]
+uint16_t sensorWeights = [-15, -14, -12, -8, 8, 12, 14, 15]
 
 void setup()
 {
@@ -8,6 +11,7 @@ void setup()
   Serial.begin(9600); // set the data rate in bits per second for serial data transmission
   delay(2000);
 }
+
 
 
 void loop()

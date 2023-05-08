@@ -1,7 +1,7 @@
 #include <ECE3.h>
 #include <constants.h>
 
-uint16_t sensorValues[8] = [0, 0, 0, 0, 0, 0, 0, 0];
+uint16_t sensorValues[NUM_SENS] = [0, 0, 0, 0, 0, 0, 0, 0];
 
 void setup()
 {

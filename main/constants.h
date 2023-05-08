@@ -9,6 +9,8 @@
 //pins
 #define FRONT_RIGHT_LED_PIN 41
 #define FRONT_LEFT_LED_PIN 51
+#define LEFT_NSLP_PIN 31
+#define RIGHT_NSLP_PIN 11
 #define DIR_L_PIN 29
 #define DIR_R_PIN 30
 #define PWML_PIN 40

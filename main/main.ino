@@ -9,6 +9,21 @@ void setup()
   delay(2000);
 }
 
+void readIRsensors() {
+
+}
+
+void normalizeSensorValues() {
+
+}
+
+void weightSensorValues {
+
+}
+
+void calculateMotorOutputs{
+  
+}
 
 void loop()
 {

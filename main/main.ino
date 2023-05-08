@@ -1,17 +1,25 @@
 #include <ECE3.h>
 #include <constants.h>
-#define NUM_SENS 8
 
-uint16_t sensorValues[NUM_SENS] = [0, 0, 0, 0, 0, 0, 0, 0];
+uint16_t sensorValues[8] = [0, 0, 0, 0, 0, 0, 0, 0];
 
 void setup()
 {
+  //init IR sensros
   ECE3_Init();
-  pinMode(41, OUTPUT)
-  pinMode(
+
+  //init all pins
+  pinMode(FRONT_RIGHT_LED_PIN, OUTPUT)
+  pinMode(FRONT_LEFT_LED_PIN, OUTPUT)
+  pinMode(DIR_L_PIN, OUTPUT)
+  pinMode(DIR_R_PIN, OUTPUT)
+  pinMode(PWML_PIN, OUTPUT)
+  pinMode(PWMR_PIN, OUTPUT)
+
   Serial.begin(9600); // set the data rate in bits per second for serial data transmission
   delay(2000);
 }
+
 
 void normalizeSensorValues() {
   // find min and max element
@@ -36,30 +44,28 @@ void weightSensorValues() {
     sensorValues[i] = sensorValues[i] * sensorWeights[i];
 }
 
-void calculateMotorOutputs{
-  
+void calculateMotorOutputs() {
+  int fusedSensorOutput = 0;
+  for (int i = 0; i < NUM_SENS; i++) {
+     fusedSensorOutput += sensorValues[i];
+  }
 }
+
+int fuseSensors() {
+  int fusedSensorOutput = 0;
+  for (int i = 0; i < NUM_SENS; i++) {
+     fusedSensorOutput += sensorValues[i];
+  }
+  return fusedSensorOutput;
+}
+
 
 void loop()
 {
   // read raw sensor values
   ECE3_read_IR(sensorValues);
-  normalizeSensorValues();
-  weightSensorValues();
-  calculateMotorOutputs();
 
-  // PREVIOUS CODE START //
-  // print the sensor values as numbers from 0 to 2500, where 0 means maximum reflectance and
-  // 2500 means minimum reflectance
-  /*
-  for (unsigned char i = 0; i < NUM_SENS; i++)
-  {
-    Serial.print(sensorValues[i]);
-    Serial.print('\t'); // tab to format the raw data into columns in the Serial monitor
-  }
   Serial.println();
 
   delay(50);
-  */
-  // PREVIOUS CODE END //
 }

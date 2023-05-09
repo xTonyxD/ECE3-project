@@ -2,23 +2,14 @@
 #include "constants.h"
 
 uint16_t rawInput[] = {0, 0, 0, 0, 0, 0, 0, 0};
-int16_t sensorValues[] = {0, 0, 0, 0, 0, 0, 0, 0};
+float sensorValues[] = {0, 0, 0, 0, 0, 0, 0, 0};
+float motorSpeeds[] = {0, 0};
+int16_t lastSensorOut = 0;
 int leftSpd = 0;
 int rightSpd = 0;
+bool debug = true;
 
-// Encoder Variables
-long enc_bin_cnt;
-
-
-// Serial Communication
-char new_duty_cycle[4];
-
-const unsigned long enc_bin_len = 50; // 50 ms bins
-    // Encoder Speed Calculation Explanation:
-    // We wait for a set amount of time (enc_bin_len), and find how many
-    // times the encoder has incremented in that period. We call 
-    // this period a bin when refering to the encoder. The number 
-    // encoder counts per bin is a proportional to speed.
+//maybe if possible add pid for theo duty cycle vs real duty cycle
 
 void setup()
 {
@@ -66,64 +57,48 @@ void weightSensorValues() {
   // multiply array with weights
   int i;
   for(i=0;i<NUM_SENS;i++)
-    sensorValues[i] = sensorValues[i] * sensorWeights[i];
+    sensorValues[i] = sensorValues[i] * sensorWeights[i] / 1000;
+
+  
 }
 
-void calculateMotorOutputs() {
-  int fusedSensorOutput = fuseSensors();
-  if (fusedSensorOutput < 0) {
-    leftSpd = getSpd(50);
-    rightSpd = getSpd(0);
-  } else if (fusedSensorOutput > 0) {
-    leftSpd = getSpd(0);
-    rightSpd = getSpd(50);
-  } else if (fusedSensorOutput == 0) {
-    //donut
+void calcPID(int16_t currSensorOut) {
+  if (currSensorOut == 0) {
+    if (debug) {
+      Serial.println("***********ALL BLACK*************");
+    } else {
+      analogWrite(PWML_PIN, -255);
+      analogWrite(PWMR_PIN, 255);
+    
+      delay(100);//delay so it goes past the black bar and senses white again
+      //now should be able to PID back onto the path again
+  
+      //reset sensor outputs for PID calcs (get new readings)
+      lastSensorOut = fuseSensors();
+      delay(10);
+      currSensorOut = fuseSensors();
+    }
   }
-  analogWrite(PWML_PIN, leftSpd);
-    analogWrite(PWMR_PIN, rightSpd);
+
+  motorSpeeds[0] = 255 * (LKp * currSensorOut + LKd * (currSensorOut - lastSensorOut) + LKi * 0.5 * (currSensorOut + lastSensorOut)) / 1000;
+  motorSpeeds[1] = 255 * (RKp * currSensorOut + RKd * (currSensorOut - lastSensorOut) + RKi * 0.5 * (currSensorOut + lastSensorOut)) / 1000;
+
+  
+}
+
+void writeMotors() {
+  calcPID(fuseSensors());
+  if (debug) {
+    Serial.print("L-" + String(motorSpeeds[0]) + ", R-" + String(motorSpeeds[1])); 
+    Serial.print('\t');
+    Serial.print('\t');
+  } else {
+    analogWrite(PWML_PIN, motorSpeeds[0]);
+    analogWrite(PWMR_PIN, motorSpeeds[1]);
+  }
   delay(10);
 }
 
-int getSpd(int prev_spd) {
-
-  int bytes_avail = Serial.available();
-  if(bytes_avail == 0) // no new serial inputs
-    return prev_spd;
-    
-  else if (bytes_avail > 4) { // invalid serial input
-    
-    do { // eat invalid buffered input
-      delay(100);
-      Serial.read();
-    } while(Serial.available() > 0);  
-    Serial.println("INVALID"); 
-    //Serial.println(bytes_avail);  
-    return prev_spd;
-  }
-  
-  else {
-    for (int i = 0; i < bytes_avail; i++) // read out buffer
-      new_duty_cycle[i] = Serial.read();
-    int sum = 0;
-    for (int i = 0; i < bytes_avail; i++) { // calculate new speed
-      
-      int num = new_duty_cycle[i] - '0';
-      if (num == -38)
-        break;
-      else if (num > 9 || num < 0) { // invalid character
-        Serial.println("INVALID"); 
-        return prev_spd;
-      }
-      sum += pow(10, bytes_avail - 2 - i) * num;
-    }
-
-    if (sum >= 255)
-      return 255;
-    else
-      return sum;
-  }
-}
 
 int fuseSensors() {
   int fusedSensorOutput = 0;
@@ -133,23 +108,33 @@ int fuseSensors() {
   return fusedSensorOutput;
 }
 
+void readIR (float * sensorValuesInput) {
+  ECE3_read_IR(rawInput);
+  for(int i = 0 ; i < NUM_SENS; i++) {
+    sensorValues[i] = (float)rawInput[i];
+  } //should be fine because sensor inputs wont ever exceed int16_t max
+}
+
+//generic wrapper method to normalize and weight the sensor values
+void processSensors() {
+  normalizeSensorValues();
+  weightSensorValues();
+}
 
 void loop()
 {
-  // read raw sensor values
-  ECE3_read_IR(rawInput);
-  for(int i = 0 ; i < NUM_SENS; i++) {
-    sensorValues[i] = (int16_t)rawInput[i];
+  // read raw sensor values, spits t out to global array sensorValues
+  readIR(sensorValues);
+  processSensors();
+  writeMotors();
+  if (debug) {
+    for (unsigned char i = 0; i < 8; i++)
+    {
+      Serial.print(sensorValues[i]);
+      Serial.print('\t'); // tab to format the raw data into columns in the Serial monitor
+    }
+    Serial.println(fuseSensors());
   }
-  normalizeSensorValues();
-  weightSensorValues();
-  calculateMotorOutputs();
-  for (unsigned char i = 0; i < 8; i++)
-  {
-    Serial.print(sensorValues[i]);
-    Serial.print('\t'); // tab to format the raw data into columns in the Serial monitor
-  }
-  Serial.println(fuseSensors());
 
   delay(50);
 }

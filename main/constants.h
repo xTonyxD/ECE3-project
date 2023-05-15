@@ -20,13 +20,9 @@
 #define NUM_SENS 8
 
 //PID constants
-#define LKp 1
-#define LKi 0
-#define LKd 0
-
-#define RKp 1
-#define RKi 0
-#define RKd 0
+#define Kp 8.5
+#define Ki 0
+#define Kd 0
 
 
 const uint16_t sensorMins[] = {666, 643, 643, 643, 574, 620, 666, 689};

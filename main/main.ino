@@ -5,9 +5,13 @@ uint16_t rawInput[] = {0, 0, 0, 0, 0, 0, 0, 0};
 float sensorValues[] = {0, 0, 0, 0, 0, 0, 0, 0};
 float motorSpeeds[] = {0, 0};
 int16_t lastSensorOut = 0;
-int leftSpd = 0;
-int rightSpd = 0;
-bool debug = true;
+int leftBaseSpd = 50;
+int rightBaseSpd = 50;
+bool debug = false;
+double err = 0.0;
+bool ledState = false;
+bool lastBlack = false;
+
 
 //maybe if possible add pid for theo duty cycle vs real duty cycle
 
@@ -63,27 +67,40 @@ void weightSensorValues() {
 }
 
 void calcPID(int16_t currSensorOut) {
-  if (currSensorOut == 0) {
-    if (debug) {
-      Serial.println("***********ALL BLACK*************");
+  if (sensorValues[0] == -15 && sensorValues[7] == 15) {
+    if (!lastBlack) {
+      lastBlack = true;
     } else {
-      analogWrite(PWML_PIN, -255);
-      analogWrite(PWMR_PIN, 255);
+      
+      if (debug) {
+        Serial.println("***********ALL BLACK*************");
+        lastBlack = false;
+      } else {
+        digitalWrite(ledState, FRONT_RIGHT_LED_PIN);
+        ledState = !ledState;
+        digitalWrite(DIR_L_PIN, HIGH);
+        analogWrite(PWML_PIN, 255);
+        analogWrite(PWMR_PIN, 255);
+      
+        delay(10);//delay so it goes past the black bar and senses white again
+        //now should be able to PID back onto the path again
     
-      delay(100);//delay so it goes past the black bar and senses white again
-      //now should be able to PID back onto the path again
-  
-      //reset sensor outputs for PID calcs (get new readings)
-      lastSensorOut = fuseSensors();
-      delay(10);
-      currSensorOut = fuseSensors();
+        //reset sensor outputs for PID calcs (get new readings)
+        lastSensorOut = fuseSensors();
+        currSensorOut = fuseSensors();
+        digitalWrite(DIR_L_PIN, LOW);
+        lastBlack = false;
+      }
     }
-  }
+  } else {
 
-  motorSpeeds[0] = 255 * (LKp * currSensorOut + LKd * (currSensorOut - lastSensorOut) + LKi * 0.5 * (currSensorOut + lastSensorOut)) / 1000;
-  motorSpeeds[1] = 255 * (RKp * currSensorOut + RKd * (currSensorOut - lastSensorOut) + RKi * 0.5 * (currSensorOut + lastSensorOut)) / 1000;
-
+    if (lastBlack) lastBlack = false;  
+    err = 255 * (Kp * currSensorOut + Kd * (currSensorOut - lastSensorOut) + Ki * 0.5 * (currSensorOut + lastSensorOut)) / 1000;
   
+    motorSpeeds[0] = leftBaseSpd - err;
+    motorSpeeds[1] = rightBaseSpd + err;
+
+  }
 }
 
 void writeMotors() {
@@ -96,7 +113,6 @@ void writeMotors() {
     analogWrite(PWML_PIN, motorSpeeds[0]);
     analogWrite(PWMR_PIN, motorSpeeds[1]);
   }
-  delay(10);
 }
 
 
@@ -136,5 +152,4 @@ void loop()
     Serial.println(fuseSensors());
   }
 
-  delay(50);
 }

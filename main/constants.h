@@ -24,7 +24,7 @@
 //PID constants
 #define Kp 8.5
 #define Ki 0
-#define Kd 15
+#define Kd 10
 
 
 const uint16_t sensorMins[] = {666, 643, 643, 643, 574, 620, 666, 689};

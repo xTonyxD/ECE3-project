@@ -5,8 +5,8 @@ uint16_t rawInput[] = {0, 0, 0, 0, 0, 0, 0, 0};
 float sensorValues[] = {0, 0, 0, 0, 0, 0, 0, 0};
 float motorSpeeds[] = {0, 0};
 int16_t lastSensorOut = 0;
-int leftBaseSpd = 60;
-int rightBaseSpd = 60;
+int leftBaseSpd = 65;
+int rightBaseSpd = 65;
 
 
 bool debug = false;

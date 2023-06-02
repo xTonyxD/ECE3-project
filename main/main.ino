@@ -5,13 +5,15 @@ uint16_t rawInput[] = {0, 0, 0, 0, 0, 0, 0, 0};
 float sensorValues[] = {0, 0, 0, 0, 0, 0, 0, 0};
 float motorSpeeds[] = {0, 0};
 int16_t lastSensorOut = 0;
-int leftBaseSpd = 40;
-int rightBaseSpd = 40;
+int leftBaseSpd = 60;
+int rightBaseSpd = 60;
+
+
 bool debug = false;
 double err = 0.0;
 bool ledState = false;
 bool lastBlack = false;
-bool goingBack = true;
+int goingBack = 0;
 
 
 //maybe if possible add pid for theo duty cycle vs real duty cycle
@@ -77,24 +79,32 @@ void calcPID(int16_t currSensorOut) {
         Serial.println("***********ALL BLACK*************");
         lastBlack = false;
       } else { //allbalck condition
-        digitalWrite(ledState, FRONT_RIGHT_LED_PIN);
-        ledState = !ledState;
-        digitalWrite(DIR_L_PIN, HIGH);
-        analogWrite(PWML_PIN, 255);
-        analogWrite(PWMR_PIN, 255);
+        if (goingBack < 1) {
+          digitalWrite(ledState, FRONT_RIGHT_LED_PIN);
+          ledState = !ledState;
+          digitalWrite(DIR_L_PIN, HIGH);
+          analogWrite(PWML_PIN, 255);
+          analogWrite(PWMR_PIN, 255);
+        
+          delay(DONUT_DELAY);//delay so it goes past the black bar and senses white again
+          //now should be able to PID back onto the path again
       
-        delay(DONUT_DELAY);//delay so it goes past the black bar and senses white again
-        //now should be able to PID back onto the path again
-    
-        //reset sensor outputs for PID calcs (get new readings)
-        lastSensorOut = fuseSensors();
-        currSensorOut = fuseSensors();
-        digitalWrite(DIR_L_PIN, LOW);
-        lastBlack = false;
+          //reset sensor outputs for PID calcs (get new readings)
+          lastSensorOut = fuseSensors();
+          currSensorOut = fuseSensors();
+          digitalWrite(DIR_L_PIN, LOW);
+          lastBlack = false;
+          goingBack++;
+        } else {
+          analogWrite(PWML_PIN, 0);
+          analogWrite(PWMR_PIN, 0);
+        }
       }
+
     }
   } else {
 
+  
     if (lastBlack) lastBlack = false;
     bool barDetected = false; 
     bool flag = false; 
@@ -164,6 +174,10 @@ void loop()
   readIR(sensorValues);
   processSensors();
   writeMotors();
+  
+  if (goingBack > 1) {
+    return;
+  }
   if (debug) {
     for (int i = 7; i > -1; i--) {
       Serial.print(sensorValues[i]);

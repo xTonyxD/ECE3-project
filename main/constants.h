@@ -22,11 +22,19 @@
 #define NUM_SENS 8
 
 //PID constants
-#define Kp 8.5
+#define Kp 17
 #define Ki 0
-#define Kd 10
+#define Kd 5
 
 
 const uint16_t sensorMins[] = {666, 643, 643, 643, 574, 620, 666, 689};
 const uint16_t sensorMaxes[] = {1834, 1857,  1857, 1857, 1847, 1880, 1834, 1811};
 const int16_t sensorWeights[] = {-15, -14, -12, -8, 8, 12, 14, 15};
+
+/*changelog
+ * 
+ * speed 45, p = 10; worked, was a little faster
+ * speed 50, p = 11.5; worked, got a little faster, oscillated a lot
+ * speed 55, p = 14, d = 2; worked, got a little faster, still oscillates
+ * speed 60, p = 17, d = 5;
+ */

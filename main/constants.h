@@ -3,7 +3,7 @@
 #define SENSOR_READ_INT 50000
 #define LED_UPDATE_INT 50000
 
-#define DONUT_DELAY 300
+#define DONUT_DELAY 350
 
 #include <stdint.h>
 #include <Arduino.h>
@@ -22,9 +22,9 @@
 #define NUM_SENS 8
 
 //PID constants
-#define Kp 21
+#define Kp 14
 #define Ki 0
-#define Kd -.5
+#define Kd 2
 
 
 const uint16_t sensorMins[] = {666, 643, 643, 643, 574, 620, 666, 689};
@@ -44,4 +44,5 @@ const int16_t sensorWeights[] = {-15, -14, -12, -8, 8, 12, 14, 15};
  * speed 65, p = 21; almost works, car breaks after track break
  * peed 65, p = 21, d = 1; same as last
  * speed 65, p = 21, d = -.5
+ * 
  */ 

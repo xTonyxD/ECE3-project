@@ -5,8 +5,8 @@ uint16_t rawInput[] = {0, 0, 0, 0, 0, 0, 0, 0};
 float sensorValues[] = {0, 0, 0, 0, 0, 0, 0, 0};
 float motorSpeeds[] = {0, 0};
 int16_t lastSensorOut = 0;
-int leftBaseSpd = 65;
-int rightBaseSpd = 65;
+int leftBaseSpd = 55;
+int rightBaseSpd = 55;
 
 
 bool debug = false;
@@ -73,13 +73,14 @@ void calcPID(int16_t currSensorOut) {
   if (sensorValues[0] == -15 && sensorValues[7] == 15 && sensorValues[3] == -8 && sensorValues[4] == 8) {
     if (!lastBlack) {
       lastBlack = true;
-    } else {
-      
+    } 
+    else {
       if (debug) {
         Serial.println("***********ALL BLACK*************");
         lastBlack = false;
-      } else { //allbalck condition
-        if (goingBack < 1) {
+      } 
+      else { //all black condition
+        if (goingBack == 0) { // first time
           digitalWrite(ledState, FRONT_RIGHT_LED_PIN);
           ledState = !ledState;
           digitalWrite(DIR_L_PIN, HIGH);
@@ -98,13 +99,12 @@ void calcPID(int16_t currSensorOut) {
         } else {
           analogWrite(PWML_PIN, 0);
           analogWrite(PWMR_PIN, 0);
+          while (1) {}
         }
       }
-
     }
-  } else {
-
-  
+  } 
+  else {
     if (lastBlack) lastBlack = false;
     bool barDetected = false; 
     bool flag = false; 
@@ -112,7 +112,8 @@ void calcPID(int16_t currSensorOut) {
       if (sensorValues[i] == float(sensorWeights[i])) {
         if (flag) { 
           barDetected = true;
-        } else {
+        } 
+        else {
           flag = true;
         }
       }
@@ -173,11 +174,10 @@ void loop()
   // read raw sensor values, spits t out to global array sensorValues
   readIR(sensorValues);
   processSensors();
-  writeMotors();
-  
   if (goingBack > 1) {
     return;
   }
+  writeMotors();
   if (debug) {
     for (int i = 7; i > -1; i--) {
       Serial.print(sensorValues[i]);

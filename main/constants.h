@@ -3,7 +3,7 @@
 #define SENSOR_READ_INT 50000
 #define LED_UPDATE_INT 50000
 
-#define DONUT_DELAY 350
+#define DONUT_DELAY 300
 
 #include <stdint.h>
 #include <Arduino.h>
@@ -22,9 +22,9 @@
 #define NUM_SENS 8
 
 //PID constants
-#define Kp 14
+#define Kp 21
 #define Ki 0
-#define Kd 2
+#define Kd -2
 
 
 const uint16_t sensorMins[] = {666, 643, 643, 643, 574, 620, 666, 689};
@@ -42,7 +42,35 @@ const int16_t sensorWeights[] = {-15, -14, -12, -8, 8, 12, 14, 15};
  * speed 65, p = 19, d = -5; did not work
  * speed 65, p = 21, d = -5; did not work, osc too much
  * speed 65, p = 21; almost works, car breaks after track break
- * peed 65, p = 21, d = 1; same as last
+ * speed 65, p = 21, d = 1; same as last
  * speed 65, p = 21, d = -.5
- * 
+ * speed 70, p = 21, d = -2; wobbly but worked
+ * speed 85, p = 35, d = -5; wobbly, did not recognize first black bar
+ * speed 85, p = 35, d = -7; it completed the first half of the track, it was just too wobbly at the first black bar
+ * speed 85, p = 35, d = 7; did not work
+ * speed 87, p = 35, d = -7; did not work
+ * speed 85, p = 35, d = -12; did not work
+ * speed 85, p = 35, d = -20; did not work
+ * speed 85, p = 40, d = -7; did not pass vertical black bars
+ * speed 85, p = 50, d = -10; did not work
+ * speed 85, p = 35, d = -7.5; worked first half
+ * speed 85, p = 35, d = -7.75; worked first falf
+ * speed 85, p = 35, d = -7.25; did not work
+ * speed 85, p = 35, d = -8; did not work 
+ * speed 85, p = 30, d = -7.75; did not work
+ * speed 85, p = 21, d = -7; did not work
+ * speed 85, p = 25, d = -7; did not work
+ * speed 85, p = 27.5, d = -7; worked first half
+ * speed 85, p = 27.5, d = -7.25; did not work
+ * speed 85, p = 28, d = 7; did not work
+ * speed 85, p = 28, d = 0; did not work
+ * speed 85, p = 27.5, d = -7; did not work
+ * speed 75, p = 21, d = -2; worked ******************** new fastest working version
+ * speed 80, p = 21, d = -2; did not work
+ * speed 80, p = 24, d = -3; did not work
+ * speed 80, p = 25, d = -3; worked?
+ * speed 100, p = 50, d = 0; did not work
+ * speed 100, p = 60, d = 0; did not work
+ * speed 100, p = 25, d = 3;
+ * DONE
  */ 
